@@ -6,7 +6,6 @@ class State(models.Model):
     """
     The State model represents a US state with its name
     and abbreviation.
-
     State is a Value Object and, therefore, does not have a
     direct URL to view it.
     """
@@ -32,7 +31,7 @@ class Location(models.Model):
     room_count = models.PositiveSmallIntegerField()
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-
+    picture_url = models.URLField(null=True)
     state = models.ForeignKey(
         State,
         related_name="+",  # do not create a related name on State
@@ -56,7 +55,6 @@ class Conference(models.Model):
 
     # Has a one-to-many relationship with presentations.Presentation
     # Has a one-to-many relationship with attendees.Attendee
-
     name = models.CharField(max_length=200)
     starts = models.DateTimeField()
     ends = models.DateTimeField()
@@ -65,7 +63,6 @@ class Conference(models.Model):
     updated = models.DateTimeField(auto_now=True)
     max_presentations = models.PositiveSmallIntegerField()
     max_attendees = models.PositiveIntegerField()
-
     location = models.ForeignKey(
         Location,
         related_name="conferences",

@@ -6,7 +6,6 @@ class Status(models.Model):
     """
     The Status model provides a status to a Presentation, which
     can be SUBMITTED, APPROVED, or REJECTED.
-
     Status is a Value Object and, therefore, does not have a
     direct URL to view it.
     """
@@ -30,22 +29,29 @@ class Presentation(models.Model):
     presenter_name = models.CharField(max_length=150)
     company_name = models.CharField(max_length=150, null=True, blank=True)
     presenter_email = models.EmailField()
-
     title = models.CharField(max_length=200)
     synopsis = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
-
     status = models.ForeignKey(
         Status,
         related_name="presentations",
         on_delete=models.PROTECT,
     )
-
     conference = models.ForeignKey(
         "events.Conference",
         related_name="presentations",
         on_delete=models.CASCADE,
     )
+
+    def approve(self):
+        status = Status.objects.get(name="APPROVED")
+        self.status = status
+        self.save()
+
+    def reject(self):
+        status = Status.objects.get(name="REJECTED")
+        self.status = status
+        self.save()
 
     def get_api_url(self):
         return reverse("api_show_presentation", kwargs={"id": self.id})
@@ -55,3 +61,10 @@ class Presentation(models.Model):
 
     class Meta:
         ordering = ("title",)  # Default ordering for presentation
+
+    @classmethod
+    def create(cls, **kwargs):
+        kwargs["status"] = Status.objects.get(name="SUBMITTED")
+        presentation = cls(**kwargs)
+        presentation.save()
+        return presentation
